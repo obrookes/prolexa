@@ -17,18 +17,24 @@ iverb(p,M)			--> [Verb],   {pred2gr(_P,1,v/Verb,M)}.
 
 % unary predicates for adjectives, nouns and verbs
 pred(human,   1,[a/human,n/human]).
-
 pred(mortal,  1,[a/mortal,n/mortal]).
-%pred(man,     1,[a/male,n/man]).
-%pred(woman,   1,[a/female,n/woman]).
-%pred(married, 1,[a/married]).
-%pred(bachelor,1,[n/bachelor]).
-%pred(mammal,  1,[n/mammal]).
+pred(man,     1,[a/male,n/man]).
+pred(woman,   1,[a/female,n/woman]).
+pred(married, 1,[a/married]).
+pred(bachelor,1,[n/bachelor]).
+pred(mammal,  1,[n/mammal]).
 pred(bird,    1,[n/bird]).
-%pred(bat,     1,[n/bat]).
+pred(bat,     1,[n/bat]).
 pred(penguin, 1,[n/penguin]).
 pred(sparrow, 1,[n/sparrow]).
 pred(fly,     1,[v/fly]).
+
+% Conductivity puzzle predicates
+pred(insulator,1,[n/insulator]).
+pred(conductor, 1,[n/conductor]).
+pred(metal,   1,[n/metal]).
+pred(iron,    1,[n/iron]).
+pred(nail,	  1,[n/nail]).
 
 pred2gr(P,1,C/W,X=>Lit):-
 	pred(P,1,L),
@@ -96,6 +102,10 @@ proper_noun(s,tweety) --> [tweety].
 proper_noun(s,peter) --> [peter].
 proper_noun(s,otto)	--> [otto].
 
+% Conductivity puzzle predicates
+proper_noun(s,metal) --> [metal].
+proper_noun(s,iron) --> [iron].
+proper_noun(s,nail) --> [nail].
 
 %%% questions %%%
 
