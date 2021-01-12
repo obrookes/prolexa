@@ -88,9 +88,21 @@ add_body_to_rulebase(A,Rs0,[[(A:-true)]|Rs0]).
 %%% meta-interpreter that constructs proofs %%%
 
 % 3d argument is accumulator for proofs
+
+
 prove_rb(true,_Rulebase,P,P):-!.
 
 prove_rb((false,_B),_Rulebase, P, P):-!.
+
+prove_rb(not([(H:-B)]),Rulebase,P0,P):-!,
+        numbervars((H:-B),0,_),
+        add_body_to_rulebase(B,Rulebase,RB2),
+        prove_rb(not(H),RB2,P0,P).
+
+prove_rb([(H:-B)],Rulebase,P0,P):-!,
+        numbervars((H:-B),0,_),
+        add_body_to_rulebase(B,Rulebase,RB2),
+        prove_rb(H,RB2,P0,P).
 
 prove_rb((A,B),Rulebase,P0,P):-!,
 	find_clause((A:-C),Rule,Rulebase),
@@ -101,6 +113,7 @@ prove_rb(A,Rulebase,P0,P):-
     find_clause((A:-B),Rule,Rulebase),
 	prove_rb(B,Rulebase,[p(A,Rule)|P0],P).
 
+
 prove_rb(not(A), Rulebase, P0, P):-
 	find_clause((false:-A), Rule, Rulebase),
 	prove_rb((false,A), Rulebase, [p(not(A),Rule)|P0], P).
@@ -109,17 +122,27 @@ prove_rb(c(A, B), Rulebase, P0, P):-
 	prove_rb(A, Rulebase, P0, P),
 	prove_rb(B, Rulebase, P0, P).
 
+/*
 prove_rb(A,Rulebase,P0,[p(A,Rule)|P]):-
-	find_clause((A:-B,not(C)),Rule,Rulebase),
-	prove_rb(B,Rulebase,P0,P),
-	prove_rb(not(C),Rulebase,P,_).
-	% last line could be replaced with the below...
-	% not prove_rb(C,Rulebase,P,_).
+	find_clause((A:-not(B)),Rule,Rulebase),
+	not prove_rb(B,Rulebase,P0,P).
+*/
 
 prove_rb(A,Rulebase,P0,[p(A,Rule)|P]):-
 	find_clause(((A:-B,not(C))),Rule,Rulebase),
 	prove_rb(B,Rulebase,P0,P),
 	not prove_rb(C,Rulebase,P,_).
+
+prove_rb(A,Rulebase,P0,[p(A,Rule)|P]):-
+	find_clause((A:-B,not(C)),Rule,Rulebase),
+	prove_rb(B,Rulebase,P0,P),
+	prove_rb(not(C),Rulebase,P,_).
+	% last line could NOT be replaced with the below...
+	% not prove_rb(C,Rulebase,P,_).
+
+prove_rb(A,Rulebase,_P0,[p(A,Rule)|P]):-
+	find_clause((A:-not(B)),Rule,Rulebase),
+	not prove_rb(B,Rulebase,P,_).
 
 % top-level version that ignores proof
 prove_rb(Q,RB):-
@@ -133,12 +156,16 @@ find_clause(Clause,Rule,[_Rule|Rules]):-
 	find_clause(Clause,Rule,Rules).
 
 % transform instantiated, possibly conjunctive, query to list of clauses
+transform(not([(A:-B)]),[(A:-B)]).
+transform([(A:-B)], [(A:-B)]).
 transform((A,B),[(A:-true)|Rest]):-!,
     transform(B,Rest).
+transform(A,[(A:-true)]).
+/*
 transform((not(A),B),[(false:-A)|Rest]):-!,
 	transform(B,Rest).
-transform(A,[(A:-true)]).
 transform(not(A),[(false:-A)]).
+*/
 
 %%% Two more commands: all_rules/1 and all_answers/2
 
